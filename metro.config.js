@@ -1,4 +1,4 @@
-const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 
 /**
  * Metro configuration
@@ -6,6 +6,21 @@ const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
  *
  * @type {import('metro-config').MetroConfig}
  */
-const config = {};
+const config = {
+  resolver: {
+    resolveRequest: (context, realModuleName, platform, moduleName) => {
+      if (realModuleName === 'invariant') {
+        return {
+          type: 'sourceFile',
+          filePath: require.resolve('invariant/browser.js'),
+        };
+      }
+      return context.resolveRequest(context, realModuleName, platform, moduleName);
+    },
+    extraNodeModules: {
+      invariant: require.resolve('invariant'),
+    },
+  },
+};
 
 module.exports = mergeConfig(getDefaultConfig(__dirname), config);
